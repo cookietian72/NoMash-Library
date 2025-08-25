@@ -28,6 +28,7 @@ const clearForm = () => {
   formData.value = {
     username: '',
     password: '',
+    confirmPassword: '', 
     isAustralian: false,
     reason: '',
     gender: ''
@@ -39,7 +40,8 @@ const errors = ref({
   password: null,
   resident: null,
   gender: null,
-  reason: null
+  reason: null,
+  confirmPassword: null
 })
 
 const validateName = (blur) => {
@@ -84,13 +86,10 @@ const validateConfirmPassword = (blur) => {
 const message = ref('');
 
 const validateFriendInReason = () => {
-  const reason = formData.value.reason || '';
-   if (reason.toLowerCase().includes('friend')) {
-    message.value = 'Great to have a friend';
-  } else {
-    message.value = '';
-  }
-};
+  const reason = (formData.value.reason || '').toLowerCase()
+  if (reason.toLowerCase().includes('friend')) {
+  message.value = reason.includes('friend') ? 'Great to have a friend' : ''
+}};
 
 </script>
 
@@ -177,8 +176,11 @@ const validateFriendInReason = () => {
               id="reason"
               rows="3"
               v-model="formData.reason"
+              @input="validateFriendInReason"
             ></textarea>
           </div>
+          <div v-if="message" class="mt-2 text-success">{{ message }}</div>
+
 
           <div class="text-center">
             <button type="submit" class="btn btn-primary me-2">Submit</button>
