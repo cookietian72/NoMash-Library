@@ -18,7 +18,8 @@ const submitForm = () => {
   validateName(true)
   validatePassword(true)
   validateConfirmPassword(true)
-  if (!errors.value.username && !errors.value.password && !errors.value.confirmPassword) {
+  validateReason(true);
+  if (!errors.value.username && !errors.value.password && !errors.value.confirmPassword && !errors.value.reason) {
     submittedCards.value.push({ ...formData.value })
     clearForm()
   }
@@ -33,6 +34,8 @@ const clearForm = () => {
     reason: '',
     gender: ''
   }
+  message.value = null
+  errors.value.reason = null
 }
 
 const errors = ref({
@@ -75,6 +78,14 @@ const validatePassword = (blur) => {
   }
 }
 
+const validateReason = (blur) => {
+  if (formData.value.reason.trim().length < 10) {
+    if (blur) errors.value.reason = "Reason must be at least 10 characters long.";
+  } else {
+    errors.value.reason = null;
+  }
+};
+
 const validateConfirmPassword = (blur) => {
   if (formData.value.password !== formData.value.confirmPassword) {
     if (blur) errors.value.confirmPassword = 'Passwords do not match.'
@@ -83,13 +94,12 @@ const validateConfirmPassword = (blur) => {
   }
 }
 
-const message = ref('');
+const message = ref(null);
 
 const validateFriendInReason = () => {
   const reason = (formData.value.reason || '').toLowerCase()
-  if (reason.toLowerCase().includes('friend')) {
-  message.value = reason.includes('friend') ? 'Great to have a friend' : ''
-}};
+  message.value = reason.includes('friend') ? 'Great to have a friend' : null;
+};
 
 </script>
 
@@ -175,9 +185,11 @@ const validateFriendInReason = () => {
               class="form-control"
               id="reason"
               rows="3"
+              @blur="()=> validateReason(true)"
+              @input="() => { validateReason(false); validateFriendInReason(); }"
               v-model="formData.reason"
-              @input="validateFriendInReason"
             ></textarea>
+            <div v-if="errors.reason" class="text-danger">{{ errors.reason }}</div>
           </div>
           <div v-if="message" class="mt-2 text-success">{{ message }}</div>
 
